@@ -1,0 +1,7 @@
+# Add one Cursor referral URL per line
+# Lines starting with # are ignored
+# CSV format also works -- the parser extracts the first http URL per line
+#
+# Examples:
+https://cursor.com/referral?code=YOUR_CODE_HERE
+https://cursor.com/referral?code=ANOTHER_CODE

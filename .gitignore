@@ -1,0 +1,17 @@
+node_modules/
+.DS_Store
+
+# output files
+dist.txt
+run-output.txt
+
+# user data -- keep your real codes out of the repo
+urls.txt
+
+# env
+.env
+.env.local
+
+# cursor/ide local
+.cursor/
+.claude/

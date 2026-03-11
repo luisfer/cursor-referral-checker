@@ -1,0 +1,26 @@
+{
+  "name": "cursor-referral-checker",
+  "version": "1.0.0",
+  "description": "Batch-check Cursor referral codes to find which are still available. CLI tool using Playwright.",
+  "type": "module",
+  "scripts": {
+    "check": "node check-referral-codes.mjs",
+    "check:file": "node check-referral-codes.mjs < urls.txt"
+  },
+  "keywords": [
+    "cursor",
+    "referral",
+    "checker",
+    "ambassador",
+    "community",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "playwright": "^1.58.2"
+  }
+}
