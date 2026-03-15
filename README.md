@@ -61,16 +61,17 @@ cat urls.txt | node check-referral-codes.mjs
 
 ## Project Structure
 
-- `check-referral-codes.mjs`: main CLI script. Launches headless Chromium, visits each URL, and detects used vs available codes.
+- `check-referral-codes.mjs`: main CLI script. Launches headless Chromium, visits each URL, classifies codes with flexible pattern matching, and retries unknowns automatically.
 - `urls.example.txt`: example input file template.
 
 ## How It Works
 
 1. Launches a headless Chromium browser via Playwright.
 2. Visits each referral URL and waits for the page to render.
-3. Checks the page content for the "already been used" message.
-4. Prints real-time results with status icons (`✓` available, `✗` used, `?` error).
-5. Writes all available URLs to `dist.txt`.
+3. Classifies each code using flexible regex patterns that detect **used**, **available**, **invalid**, and **unknown** states -- resilient to minor wording changes on Cursor's page.
+4. Automatically retries any **unknown** results (pages that didn't finish rendering) with a longer wait time and lower concurrency ("segunda pasada").
+5. Prints real-time results with status icons (`✓` available, `✗` used, `⚠` invalid, `?` unknown/error).
+6. Writes available URLs to `dist.txt` and a full CSV audit log to `dist.csv`.
 
 ## Input File Format
 
@@ -107,25 +108,36 @@ Result: 2 URLs extracted, other lines ignored.
 Console output (real-time):
 
 ```
-[1/100] ✗ https://cursor.com/referral?code=XXXXX → used
-[2/100] ✓ https://cursor.com/referral?code=YYYYY → available
-[3/100] ? https://cursor.com/referral?code=ZZZZZ → error (timeout)
+[1/100] ✗ https://cursor.com/referral?code=XXXXX → used | already been used
+[2/100] ✓ https://cursor.com/referral?code=YYYYY → available | received a $50.00 credit
+[3/100] ? https://cursor.com/referral?code=ZZZZZ → unknown | Loading...
 
---- Summary ---
-Used: 85 | Available: 15 | Errors: 0
+--- Segunda pasada 1/2: retrying 1 unknown codes (wait: 8000ms, concurrency: 1) ---
+
+[retry 1][1/1] ✓ https://cursor.com/referral?code=ZZZZZ → available | received a $50.00 credit
+
+--- Final Summary ---
+Used: 85 | Available: 15 | Invalid: 0 | Errors: 0 | Unknown: 0
 
 Available URLs written to dist.txt
+Full results with messages written to dist.csv
 ```
 
-File output (`dist.txt`): one available URL per line.
+**File outputs:**
+- `dist.txt` -- one available URL per line.
+- `dist.csv` -- full audit log with URL, status, and the actual message from Cursor's page for manual verification.
 
 ## Configuration
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| Navigation timeout | 15 s | Max wait for page load per URL |
-| Render delay | 1.2 s | Extra wait for React/Next.js hydration |
+| Navigation timeout | 30 s | Max wait for page load per URL |
+| Render delay | 2.5 s | Extra wait for React/Next.js hydration |
+| Retry delay | 8 s | Wait time per retry pass (multiplied by attempt number) |
+| Max retries | 2 | Number of retry passes for unknown results |
+| Retry concurrency | 1 | Concurrency during retries (lower = more reliable) |
 | Output file | `dist.txt` | Where available URLs are saved |
+| CSV output | `dist.csv` | Full audit log with status and page message |
 | Concurrency | 3 | Number of URLs checked in parallel |
 
 ## Tech Stack

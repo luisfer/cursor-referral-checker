@@ -3,6 +3,8 @@ node_modules/
 
 # output files
 dist.txt
+dist-2.txt
+dist.csv
 run-output.txt
 
 # user data -- keep your real codes out of the repo
