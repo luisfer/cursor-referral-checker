@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "check": "node check-referral-codes.mjs",
-    "check:file": "node check-referral-codes.mjs < urls.txt"
+    "check:file": "node check-referral-codes.mjs < urls.txt",
+    "sweep": "node check-referral-codes.mjs < dist.txt"
   },
   "keywords": [
     "cursor",
